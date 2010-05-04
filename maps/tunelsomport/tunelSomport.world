@@ -1,0 +1,79 @@
+# World parameters
+
+resolution     0.02
+interval_sim   200
+interval_real  200
+size [132.993 356.524]
+#size [100 100] 
+ 
+include "inc/cars.inc"
+
+include "inc/types.inc"
+
+include "inc/sick.inc"
+
+include "inc/pioneerModels.inc"
+
+
+# size of the world in meters
+gui_disable 0
+gui_interval 100
+gui_menu_interval 20
+
+window( 
+  size [ 1008.000 735.000 ] 
+  center [71.127 -165.080] 
+  scale 0.068 
+)
+
+
+p3at
+(
+  name "robot1"
+  color "red"
+
+  # Localizacion con odometria
+  #localization "gps"
+  #localization_origin [x y th]
+
+  # Localizacion con odometria
+  # localization "gps"
+  # odom_error [eX eY eTh]
+
+  # Posicion en el mundo
+  pose [-43.034 34.445 0.000]
+  #pose [3 -46 -90]
+  # Configuracion del laser
+  sicklms200( samples 361 laser_sample_skip 4 pose [0.160 0.000 0.000])
+
+)
+
+p3at
+(
+  name "robot2"
+  color "blue"
+
+  # Localizacion con odometria
+#  localization "gps"
+  #localization_origin [x y th]
+
+  # Localizacion con odometria
+  # localization "gps"
+  # odom_error [eX eY eTh]
+
+  # Posicion en el mundo
+  pose [61.862 -177.179 89.924]
+  #pose [3 -46 -90]
+  # Configuracion del laser
+  sicklms200( samples 361 laser_sample_skip 4 pose [0.160 0.000 0.000])
+
+)
+
+map( 
+  bitmap "bitmaps/tunelSomport.png" 
+#  bitmap "bitmaps/curvas.png" 
+  map_resolution 1
+size [132.993 356.524]
+# size [100 100] 
+  name "tunel"
+)
