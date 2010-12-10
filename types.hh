@@ -1,5 +1,4 @@
 /*
- *  Player - One Hell of a Robot Server
  *  Copyright (C) 2010
  *     Alejandro R. Mosteo
  *
