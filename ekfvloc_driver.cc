@@ -1,7 +1,7 @@
 /*
  *  Player - One Hell of a Robot Server
- *  Copyright (C) 2007
- *     Brian Gerkey
+ *  Copyright (C) 2010
+ *     Alejandro R. Mosteo
  *
  *
  *  This library is free software; you can redistribute it and/or
@@ -948,6 +948,12 @@ void Ekfvloc::PublishInterfaces(double timestamp)
     const Matrix cov = localize_.GetCovariance();
     player_localize_hypoth_t hyp[1] =
         {{{new_pose.x, new_pose.y, new_pose.th}, {cov(0, 0), cov(1, 1), cov(2, 2)}, 1.0}};
+    //    {{{new_pose.x, new_pose.y, new_pose.th}, {cov(0, 0), cov(1, 1), cov(2, 2),
+    //                                              cov(0, 1), cov(1, 2), cov(0,2) }, 1.0}};
+    // This was contributed as a patch for the extended localization interface,
+    // but I though this had dissapeared at some point (2.x -> 3.x ?)
+    // So here it is, but commented.
+        
     player_localize_data_t loc_data = { 0, timestamp, 1, hyp};
     Publish(loc_addr_, PLAYER_MSGTYPE_DATA, PLAYER_LOCALIZE_DATA_HYPOTHS,
             static_cast<void*>(&loc_data));
