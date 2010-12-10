@@ -1,8 +1,14 @@
-IF (HAVE_STL)
-	PLAYERDRIVER_OPTION (ekfvloc build_ekfvloc ON)
-ELSE (HAVE_STL)
+cmake_minimum_required(VERSION 2.6)
+
+find_file (HAVE_GSL gsl_version.h /usr/include /usr/include/gsl)
+
+if (NOT HAVE_GSL)
+    PLAYERDRIVER_OPTION (nxt build_nxt OFF "libusb-1.0 not found (package libusb-1.0-0-dev in debian)")
+elseif(NOT HAVE_STL)
 	PLAYERDRIVER_OPTION (ekfvloc build_ekfvloc OFF "STL not found")
-ENDIF (HAVE_STL)
+else()
+    PLAYERDRIVER_OPTION (ekfvloc build_ekfvloc ON)
+endif ()
 
 PLAYERDRIVER_REQUIRE_OS(ekfvloc build_ekfvloc UNIX)
 PLAYERDRIVER_ADD_DRIVER(

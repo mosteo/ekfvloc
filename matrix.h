@@ -1,6 +1,14 @@
 ////////////////////////////////
 // Matrix TCL Lite v1.13
 // Copyright (c) 1997-2002 Techsoft Pvt. Ltd. (See License.Txt file.)
+
+// Matrix TCL Lite is the free version of matrix template class library for
+// performing matrix calculations with ease and efficiency in C++ programs.
+// However, it supports only basic matrix operations. It is actually the older
+// version of our Matrix TCL Pro package and does not contain separate
+// documentation except some brief description at the top of the header file.
+// This library is free for educational and non-commercial use.
+
 //
 // Matrix.h: Matrix C++ template class include file
 // Web: http://www.techsoftpl.com/matrix/
