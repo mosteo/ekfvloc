@@ -20,7 +20,6 @@
 
 
 #include <cfloat>
-#include <libplayercore/playercore.h>
 #include "params.hh"
 #include "robot_location.hh"
 
@@ -184,10 +183,11 @@ void RobotLocation::Update(ObservedFeatures obs)
 
         if (best_feat >= 0)
         {
-            PLAYER_MSG7(4, "MATCH: %3d -- %3d [MAH:%8.3f][OVL:%8.3f/%8.3f/%8.3f/%8.3f]\n",
-                i, best_feat, best_dist,
-                best_xerr, obs.features(i).dimension(), map_.lengths(best_feat),
-                best_xerr - ((obs.features(i).dimension() + map_.lengths(best_feat))/2.0));
+            // DEBUG:
+            // printf("MATCH: %3d -- %3d [MAH:%8.3f][OVL:%8.3f/%8.3f/%8.3f/%8.3f]\n",
+            //    i, best_feat, best_dist,
+            //    best_xerr, obs.features(i).dimension(), map_.lengths(best_feat),
+            //    best_xerr - ((obs.features(i).dimension() + map_.lengths(best_feat))/2.0));
 
             // Centering    
             UpdateWithMatch(&XwRk, obs.features(i), map_.segments(best_feat));
@@ -259,80 +259,6 @@ void RobotLocation::Update(ObservedFeatures obs)
     return;
 
     */
-
-    /* OLD STUMBLING METHOD:
-
-    for (int i = 0; i < obs.Count(); i++)
-    {
-        const Transf Xre = obs.features(i).Loc();
-        const Matrix Ce  = obs.features(i).Cov();
-        
-        for (int j = 0; j < map_.NumSegments(); j++)
-        {
-            const Transf Xwm = map_.segments(j);
-            const Transf Xme = TRel(Xwm, Compose(XwRk.kX(), Xre));
-
-            // Compute h
-            const Matrix h = Bme * Xme;
-
-            // Compute HR
-            const Matrix Jer = InvJacobian(Xre);
-            const Matrix J2  = J2zero(Xme);
-            const Matrix HR  = Bme * J2 * Jer;
-
-            // Compute GE
-            const Matrix GE = Bme * J2 * ~Bme;
-
-            // Hypothesis test -> Mahalanobis distance
-            Matrix Cinn = !(HR * XwRk.kCov() * (~HR) + GE * Ce * (~GE));
-            Matrix d2   = (~h) * Cinn * h;
-
-            if (d2(0, 0) <= 5.99) // TODO name this constant
-            {
-                if (verifyOverlapping(Xme, map_.lengths(j), obs.features(i).dimension()))
-                {
-                    PLAYER_MSG3(4, "Set best match: %3d -- %3d (%8.3f)", i, j, d2(0, 0));
-                    printf("MATCH: %3d -- %3d [MAH:%8.3f][OVL:%8.3f/%8.3f/%8.3f/%8.3f]\n",
-                           i, j, d2(0, 0),
-                           fabs(Xme.x()), obs.features(i).dimension(), map_.lengths(j),
-                           fabs(Xme.x()) - ((obs.features(i).dimension() + map_.lengths(j))/2.0));
-                    
-                    Matrix K  = XwRk.kCov() * ~HR * Cinn;
-                    Matrix Xk = -K * h;
-
-                    const Matrix P = XwRk.kCov() - K * HR * XwRk.kCov();
-
-                    //Centering
-                    XwRk.SetLoc(Compose(XwRk.kX(), Xk));
-                    XwRk.SetCov(InvJ2zero(Xk) * P * ~InvJ2zero(Xk));
-
-                    matched++;
-                    GUI_DATA.matches.push_back(obs.features(i).GetScan());
-                    GUI_DATA.mahala.push_back(d2(0, 0) / 5.99);
-
-                    break;
-                }
-                else if ((fabs(Xme.x()) - ((obs.features(i).dimension() + map_.lengths(j)))) <= 0)
-                {
-                    printf("NEAR : %3d -- %3d [MAH:%8.3f][OVL:%8.3f/%8.3f/%8.3f/%8.3f]\n",
-                           i, j, d2(0, 0),
-                           fabs(Xme.x()), obs.features(i).dimension(), map_.lengths(j),
-                           fabs(Xme.x()) - ((obs.features(i).dimension() + map_.lengths(j))/2.0));
-                }
-                else
-                    PLAYER_MSG2(6, "Pair %3d :: %3d not overlapping", i, j);
-            }
-            else if (d2(0, 0) < 100.0)
-                PLAYER_MSG3(5, "Pair %3d :: %3d too far apart: %5.2f", i, j, d2(0, 0));
-        }
-    }
-
-    */
-
-    if (matched > 0)
-        PLAYER_MSG1(2, "Ekfvloc: Matched feats: %d", matched);
-    else
-        PLAYER_WARN("Ekfvloc: No matching features!");
 }
 
 bool RobotLocation::Locate(const Transf odom, const Scan s)
@@ -356,12 +282,11 @@ bool RobotLocation::Locate(const Transf odom, const Scan s)
         //Matching & EKF
         Update(obs);
 
-        const Transf rel(TRel(odomk_1, odom));
-        PLAYER_MSG3(8, "REL[1]: %8.3f %8.3f %8.3f\n", rel.tX(), rel.tY(), rel.tPhi());
-        const Transf upd(TRel(XwRk_1.kX(), XwRk.kX()));
-        PLAYER_MSG3(8, "FIX[1]: %8.3f %8.3f %8.3f\n", upd.tX(), upd.tY(), upd.tPhi());
-        if (rel.Distance(upd) > 0.2)
-            PLAYER_MSG0(2, "JUMP in localization");
+        // DEBUG:
+        // const Transf rel(TRel(odomk_1, odom));
+        // printf("REL[1]: %8.3f %8.3f %8.3f\n", rel.tX(), rel.tY(), rel.tPhi());
+        // const Transf upd(TRel(XwRk_1.kX(), XwRk.kX()));
+        // printf("FIX[1]: %8.3f %8.3f %8.3f\n", upd.tX(), upd.tY(), upd.tPhi());
         
         odomk_1 = odomk;
         XwRk_1  = XwRk;

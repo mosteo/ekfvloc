@@ -19,7 +19,7 @@
  */
 
 #include <algorithm>
-#include <libplayercore/playercore.h>
+// #include <libplayercore/playercore.h>
 #include "hregions.hh"
 #include "params.hh"
 
@@ -110,9 +110,8 @@ int farthestPointToEdge(Scan s,
 /* Calculates the point with the greater disparity with respect to an edge   */
 {
     if ((from < 0) || (from >= s.ScanCount()) || (to < 0) || (to >= s.ScanCount()))
-    {
-        PLAYER_ERROR3("Wrong uloc access in farthestPointToEdge: (%d)--(%d) (max:%d)", from, to, s.ScanCount());
-    }
+        fprintf(stderr, "Wrong uloc access in farthestPointToEdge: (%d)--(%d) (max:%d)\n",
+                        from, to, s.ScanCount());
 
     const Uloc Lse(
         integrateEndpointsInEdge(
@@ -198,8 +197,6 @@ void HRegion::IterativeLineSplit(int fromIdx, int toIdx)
 
     const int b = farthestPointToEdge(*scan_, fromIdx, toIdx, &m, &residual);
 
-    PLAYER_MSG1(9, "      Farthest idx: %d", b);
-    
     if ((b >= fromIdx) &&
         (m > CHISQUARE[0][COLUMN(kAlphaILF())]) &&
         (kCheckResidual ? verifyResidualConditions(*scan_, fromIdx, toIdx, b, residual) : true) &&
@@ -210,28 +207,29 @@ void HRegion::IterativeLineSplit(int fromIdx, int toIdx)
         
         if ((dfb > kMinDistBetweenEndpoints) && (dbt > kMinDistBetweenEndpoints))
         {
-            PLAYER_MSG3(9, "      Splitting: %3d -- %3d -- %3d", fromIdx, b, toIdx);
-            PLAYER_MSG2(9, "        because: [m > CHI] [%5.3f > %5.3f]", m, CHISQUARE[0][COLUMN(kAlphaILF())]);
+            // Debug:
+            // printf("      Splitting: %3d -- %3d -- %3d\n", fromIdx, b, toIdx);
+            // printf("        because: [m > CHI] [%5.3f > %5.3f]\n", m, CHISQUARE[0][COLUMN(kAlphaILF())]);
             endpoints_.push_back(Endpoint(*scan_, b));
             // Endpoints are not sorted here, so they will have to be at the end
             
             IterativeLineSplit(fromIdx, b);
             IterativeLineSplit(b,       toIdx);
         }
-        else
-            PLAYER_MSG0(9, "Split rejected because dist between endpoints");
+        else {
+            // Remainder of debug code:
+            // Split rejected because dist between endpoints
+        }
     }
-    else
-        PLAYER_MSG0(9, "Split rejected outright");
+    else {
+        // Remainder of debug code: nothing to do, rejected split.
+    }
 }
 
 void HRegion::IterativeLineSplit(void)
 {
     if (endpoints_.size() != 2)
-        PLAYER_ERROR1("Initial endpoints %d != 2", endpoints_.size());
-
-    PLAYER_MSG2(8, "   SPLITTING INDEXES %3d -- %3d",
-                endpoints_[0].idx(), endpoints_[1].idx());
+        fprintf(stderr, "Initial endpoints %d != 2", endpoints_.size());
                 
     IterativeLineSplit(endpoints_[0].idx(), endpoints_[1].idx());
     sort(endpoints_.begin(), endpoints_.end());
@@ -245,21 +243,12 @@ void IterativeLineFitting(const Scan &s, RegionsVector *r)
 {
     for (int i = 0; i < (int) r->size(); i++)
     {
-        PLAYER_MSG1(8, "SPLITTING REGION %d", i);
         r->at(i).IterativeLineSplit();
     }
-
-    PLAYER_MSG2(5, "SCAN %d -- %d", 0, s.ScanCount());
 
     for (int i = 0; i < (int) r->size(); i++)
     {
         r->at(i).PushGuiData(&GUI_DATA);
-        
-        PLAYER_MSG1(6, "REGION %02d", i);
-        for (int j = 0; j < (int) r->at(i).NumEps(); j++)
-        {
-            PLAYER_MSG2(7, "   EP %02d: %d", j, r->at(i).Ep(j).idx());
-        }
     }
 }
 

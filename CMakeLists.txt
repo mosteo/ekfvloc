@@ -1,37 +1,27 @@
-cmake_minimum_required(VERSION 2.6)
+include(CheckIncludeFiles)
 
-find_file (HAVE_GSL gsl_version.h /usr/include /usr/include/gsl)
+set( lib_name ekfvloc )
+set( libVersion 1.0.0 )
+GBX_ADD_LICENSE( LGPL2+ )
 
-if (NOT HAVE_GSL)
-    PLAYERDRIVER_OPTION (nxt build_nxt OFF "libusb-1.0 not found (package libusb-1.0-0-dev in debian)")
-elseif(NOT HAVE_STL)
-	PLAYERDRIVER_OPTION (ekfvloc build_ekfvloc OFF "STL not found")
-else()
-    PLAYERDRIVER_OPTION (ekfvloc build_ekfvloc ON)
-endif ()
+set( build TRUE )
 
-PLAYERDRIVER_REQUIRE_OS(ekfvloc build_ekfvloc UNIX)
-PLAYERDRIVER_ADD_DRIVER(
-    ekfvloc build_ekfvloc
-    
-    SOURCES
-    ekfvloc_driver.cc
-    feature.cc
-    hregions.cc
-    localize.cc
-    params.cc
-    robot_location.cc
-    scan.cc
-    segment_map.cc
-    sub_opt.cc
-    transf.cc
-    uloc.cc
+GBX_REQUIRE_OPTION( build LIB ${lib_name} ON )
 
-    CFLAGS
-    -Wall
-    -pedantic
-    -g
+CHECK_INCLUDE_FILES( gsl/gsl_version.h have_gsl )
 
-    LINKFLAGS
-    -lgsl -lgslcblas
-    )
+GBX_REQUIRE_VAR( build LIB ${lib_name} have_gsl "libgsl not found" )
+# set ( libs "gsl" ) # -lgsl -lgslcblas
+
+if( build )
+
+    include( ${GBX_CMAKE_DIR}/UseBasicRules.cmake )
+
+    file( GLOB hdrs *.hh)
+    file( GLOB srcs *.cc )
+
+    GBX_ADD_LIBRARY( ${lib_name} DEFAULT ${libVersion} ${srcs} )
+    GBX_ADD_HEADERS( ${lib_name} ${hdrs} )
+    # TARGET_LINK_LIBRARIES( ${lib_name} ${libs} )
+
+endif( build )
