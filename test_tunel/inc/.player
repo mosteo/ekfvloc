@@ -1,4 +1,0 @@
-configfile.cc:159 error   : unable to open world file nd.cfg : No such file or directory
-server.cc:144 error   : failed to load config file nd.cfg
-configfile.cc:159 error   : unable to open world file upc.cfg : No such file or directory
-server.cc:144 error   : failed to load config file upc.cfg
