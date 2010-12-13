@@ -1,0 +1,12 @@
+This library implements segment-based EKF localization:
+
+"Mobile Robot Localization and Map Building: A Multisensor Fusion Approach"
+J.A. Castellanos and J.D. Tardós
+Kluwer Academic Publishers, Boston, 1999
+ISBN 0-7923-7789-3
+
+Code follows (mostly) Google source code conventions.
+
+Usage interface is via robot_location.hh
+
+Tuning parameters are in params.hh
