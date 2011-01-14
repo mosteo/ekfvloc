@@ -1,0 +1,61 @@
+# Desc: 1 pioneer3dx robot with laser	
+# Author:  Luis Riazuelo (riazuelo@unizar.es)
+# Date: 13 Junio 2007
+
+unit_length "m"
+unit_angle "radians"
+# FUNDAMENTAL: Included pioneer.inc uses radians!
+
+# defines Pioneer robots
+include "inc/p3at.inc"
+
+
+
+# size of the world in meters
+size [10 50]
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.001
+interval_real 100
+interval_sim 100
+
+# update the screen every 10ms (we need fast update for the stest demo)
+gui_interval 20
+
+# configure the GUI window
+window
+( 
+  size [ 1272.000 767.000 ] 
+  center [1.877 -0.053] 
+  scale 0.060
+)
+
+# map
+model (
+  pose [0.000 0.000 0.000]
+  size [10 40]
+  bitmap "box.png"
+  gui_nose 0
+  gui_grid 1
+  gui_movemask 0
+  gui_boundary 0
+  laser_return 1
+)
+
+# create a robot
+p3at
+(
+  name "robot"
+  color "red"
+  pose [0.000 -19.000 1.570]
+  localization "gps"
+  odom_error [0.01 0.01 0.02] # copied from pioneer.inc
+
+  sicklms200( 
+     pose [0.120 0.000 0.000]
+     range_max 80.0
+     samples 361
+     fov 3.1415926535
+     noise 0.01 # +/-10mm according to spec sheet, statistical error 10mm = 1-sigma (???)
+ )
+)

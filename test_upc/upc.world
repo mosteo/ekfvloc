@@ -1,0 +1,51 @@
+# Desc: 1 pioneer3dx robot with laser	
+# Author:  Luis Riazuelo (riazuelo@unizar.es)
+# Date: 13 Junio 2007
+
+# defines Pioneer robots
+include "inc/pioneer.inc"
+include "inc/sick.inc"
+
+# defines 'map' object used for floorplans
+include "inc/map.inc"
+
+# size of the world in meters
+# size [102.8571428571428571 96.17142857142857143]
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.010
+
+# update the screen every 10ms (we need fast update for the stest demo)
+gui_interval 20
+
+# configure the GUI window
+window
+( 
+  size [ 1216.000 965.000 ] 
+  center [-0.203 -0.221] 
+  scale 7.400
+)
+
+# load an environment bitmap
+map
+( 
+  bitmap "bitmaps/upc.png"
+  size [102.857 96.171 1.000]
+  name "upc"
+)
+
+# create a robot
+pioneer2dx
+(
+  name "robot"
+  color "red"
+  pose [-49 -39 0 0]
+  localization "odom"
+  localization_origin [-49 -39 0 0]
+  odom_error [0.1 0.1 0.00 0.05]
+  sicklaser( 
+	pose [0.16 0 0 0]
+	range_max 32.0
+	samples 361
+  )
+)
