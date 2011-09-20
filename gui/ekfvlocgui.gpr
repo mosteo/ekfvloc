@@ -1,0 +1,74 @@
+with "../agpl/agpl.gpr";
+
+project Ekfvlocgui is
+
+   type Boolean          is ("True",    "False");
+   type Enabled_Disabled is ("Enabled", "Disabled");
+   type Yes_No           is ("Yes",     "No");
+
+   for Languages use ("Ada");
+
+   for Source_Dirs use (".");
+   for Object_Dir  use "obj";
+   for Exec_Dir    use "obj";
+
+   for Main use ("ekfvlocgui.adb");
+
+   package Ide is
+      for Vcs_Kind use "Subversion";
+   end Ide;
+
+   package Compiler is
+      for Default_Switches ("C")   use ("-g", "-Wall", "-O2");
+      for Default_Switches ("C++") use ("-g", "-Wall", "-O2");
+      for Default_Switches ("Ada") use
+         ("-g", "-s", "-gnatf", "-gnat05", "-gnatwa", "-gnatyacehikn", "-gnatqQ") &
+         ("-O2", "-gnato", "-fstack-check", "-gnata");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use
+        ("-E",
+         "-g",
+         "-static", -- the gnat runtime
+         ""
+        ); -- , "-r"); -- Show restrictions
+   end Binder;
+
+   package Linker is
+
+      for Default_Switches ("C")   use ("-g");
+      for Default_Switches ("C++") use ("-g");
+
+      for Default_Switches ("Ada") use
+        ("-g",
+         "-Wl,-Bstatic",  -- Static libraries
+         "-lz",
+         "-lgsl",
+         "-lgslcblas",
+
+         "-Wl,-Bdynamic", -- Shared libraries
+
+         "");
+
+   end Linker;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-g");    -- , "-j2"); -- Two files at a time
+   end Builder;
+
+   package Pretty_Printer is
+      for Default_Switches ("Ada") use ("-A1", "-A2", "-A3", "-A4");
+   end Pretty_Printer;
+
+   package Naming is
+      for Specification_Suffix  ("C") use ".h";
+      for Implementation_Suffix ("C") use ".c";
+      for Specification_Suffix  ("C++") use ".hh";
+      for Implementation_Suffix ("C++") use ".cc";
+      for Specification_Suffix  ("Changelog") use "changelog";
+      for Specification_Suffix  ("Project file") use ".gpr";
+      for Specification_Suffix  ("Python") use ".py";
+   end Naming;
+
+end Ekfvlocgui;
